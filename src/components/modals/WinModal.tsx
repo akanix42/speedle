@@ -1,15 +1,20 @@
 import { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import { CheckIcon } from "@heroicons/react/outline";
+import { CheckIcon, XIcon } from "@heroicons/react/outline";
 import { MiniGrid } from "../mini-grid/MiniGrid";
+import { getGuessStatuses } from "../../lib/statuses";
+import copyToClipboard from 'copy-to-clipboard';
+import { getDay } from '../../lib/words';
 
 type Props = {
+  isGameWon: boolean;
   isOpen: boolean;
   handleClose: () => void;
   guesses: string[];
+  maxGuessCount: number;
 };
 
-export const WinModal = ({ isOpen, handleClose, guesses }: Props) => {
+export const WinModal = ({ isGameWon, isOpen, handleClose, guesses, maxGuessCount }: Props) => {
   return (
     <Transition.Root show={isOpen} as={Fragment}>
       <Dialog
@@ -48,18 +53,23 @@ export const WinModal = ({ isOpen, handleClose, guesses }: Props) => {
           >
             <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:w-full sm:p-6">
               <div>
-                <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
-                  <CheckIcon
+                <div className={`mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-${isGameWon ? "green" : "red"}-100`}>
+                  {isGameWon
+                  ? <CheckIcon
                     className="h-6 w-6 text-green-600"
                     aria-hidden="true"
                   />
+                  : <XIcon
+                    className="h-6 w-6 text-red-600"
+                    aria-hidden="true"
+                  />}
                 </div>
                 <div className="mt-3 text-center sm:mt-5">
                   <Dialog.Title
                     as="h3"
                     className="text-lg leading-6 font-medium text-gray-900"
                   >
-                    You won!
+                    {isGameWon ? "You won!" : "It was a good try."}
                   </Dialog.Title>
                   <div className="mt-2">
                     <MiniGrid guesses={guesses} />
@@ -68,6 +78,14 @@ export const WinModal = ({ isOpen, handleClose, guesses }: Props) => {
                 </div>
               </div>
               <div className="mt-5 sm:mt-6">
+                <button
+                  type="button"
+                  className="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm"
+                  onClick={() => shareResult(guesses, maxGuessCount)}
+                >
+                  Share
+                </button>
+              </div><div className="mt-5 sm:mt-6">
                 <button
                   type="button"
                   className="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm"
@@ -83,3 +101,15 @@ export const WinModal = ({ isOpen, handleClose, guesses }: Props) => {
     </Transition.Root>
   );
 };
+
+function shareResult(guesses: string[], maxGuessCount: number) {
+  const text = guesses.reduce((combinedText, guess)=> {
+    const statuses = getGuessStatuses(guess);
+    const statusLine = statuses.reduce((combinedText, status) => {
+      const block = status === "absent" ? "⬜" : status === "correct" ? "🟩" : "🟨";
+      return `${combinedText}${block}`;
+    }, '');
+    return `${combinedText}${statusLine}\n`;
+  }, `Speedle ${getDay()} ${guesses.length}/${maxGuessCount}\n`);
+  copyToClipboard(text);
+}

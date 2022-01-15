@@ -54,7 +54,12 @@ export const AboutModal = ({ isOpen, handleClose }: Props) => {
                   </Dialog.Title>
                   <div className="mt-2">
                     <p className="text-sm text-gray-500">
-                      _Removed Due To DMCA Request_
+                      <a
+                        href="https://github.com/akanix42/speedle"
+                        className="underline font-bold"
+                      >
+                        Check out the code here
+                      </a>
                     </p>
                   </div>
                 </div>

@@ -14,7 +14,6 @@ export const MiniCell = ({ status }: Props) => {
       "bg-yellow-500": status === "present",
     }
   );
-
   return (
     <>
       <div className={classes}></div>

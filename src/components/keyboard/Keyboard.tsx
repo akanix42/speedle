@@ -1,6 +1,7 @@
 import { KeyValue } from "../../lib/keyboard";
 import { getStatuses } from "../../lib/statuses";
 import { Key } from "./Key";
+import { BackspaceIcon } from '@heroicons/react/solid'
 
 type Props = {
   onChar: (value: string) => void;
@@ -11,7 +12,6 @@ type Props = {
 
 export const Keyboard = ({ onChar, onDelete, onEnter, guesses }: Props) => {
   const charStatuses = getStatuses(guesses);
-  console.log(charStatuses);
 
   const onClick = (value: KeyValue) => {
     if (value === "ENTER") {
@@ -50,7 +50,7 @@ export const Keyboard = ({ onChar, onDelete, onEnter, guesses }: Props) => {
       </div>
       <div className="flex justify-center">
         <Key width={65.4} value="ENTER" onClick={onClick}>
-          Enter
+          ENTER
         </Key>
         <Key value="Z" onClick={onClick} status={charStatuses["Z"]} />
         <Key value="X" onClick={onClick} status={charStatuses["X"]} />
@@ -60,7 +60,7 @@ export const Keyboard = ({ onChar, onDelete, onEnter, guesses }: Props) => {
         <Key value="N" onClick={onClick} status={charStatuses["N"]} />
         <Key value="M" onClick={onClick} status={charStatuses["M"]} />
         <Key width={65.4} value="DELETE" onClick={onClick}>
-          Delete
+          <BackspaceIcon style={{width: '50%'}} />
         </Key>
       </div>
     </div>

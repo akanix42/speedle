@@ -5,9 +5,11 @@ import { Cell } from "../grid/Cell";
 type Props = {
   isOpen: boolean;
   handleClose: () => void;
+  guessTimeLimitMs: number;
+  maxGuessCount: number;
 };
 
-export const InfoModal = ({ isOpen, handleClose }: Props) => {
+export const InfoModal = ({ isOpen, handleClose, guessTimeLimitMs, maxGuessCount }: Props) => {
   return (
     <Transition.Root show={isOpen} as={Fragment}>
       <Dialog
@@ -55,9 +57,10 @@ export const InfoModal = ({ isOpen, handleClose }: Props) => {
                   </Dialog.Title>
                   <div className="mt-2">
                     <p className="text-sm text-gray-500">
-                      Guess the word of the day in 6 tries. After each guess, the color
+                      Guess the word of the day in {maxGuessCount} tries. After each guess, the color
                       of the tiles will change to show how close your guess was
-                      to the word.
+                      to the word. You only have {guessTimeLimitMs/1000} seconds to make each
+                      guess, after which whatever have you entered will be automatically submitted.
                     </p>
 
                     <div className="flex justify-center mb-1 mt-4">
