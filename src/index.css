@@ -1,3 +1,19 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.bg-letter-correct {
+  background-color: #03ecfc;
+}
+
+.border-letter-correct {
+  border-color: #03ecfc;
+}
+
+.bg-key-correct-hover {
+  background-color: #00cad9;
+}
+
+.bg-key-correct-active {
+  background-color: #009fab;
+}
