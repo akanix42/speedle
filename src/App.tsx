@@ -1,5 +1,6 @@
 import { InformationCircleIcon } from "@heroicons/react/outline";
 import { useState, useEffect, useRef } from "react";
+
 import { Alert } from "./components/alerts/Alert";
 import { Grid } from "./components/grid/Grid";
 import { TimeLeft } from './components/grid/TimeLeft';
@@ -11,6 +12,7 @@ import { clearGameState, getGameState, storeGameState } from './lib/gameState';
 import { isWordInWordList, isWinningWord, getDay } from "./lib/words";
 
 function App() {
+  const [backgroundColor, setBackgroundColor] = useState("");
   const existingGameState = getGameState();
   const [guesses, setGuesses] = useState<string[]>(existingGameState?.guesses || []);
   const [currentGuess, setCurrentGuess] = useState(existingGameState?.currentGuess || "");
@@ -25,6 +27,7 @@ function App() {
 
   const maxGuessCount = 12;
   const guessTimeLimitMs = 8000;
+  const timeLimitMs = maxGuessCount * guessTimeLimitMs;
   const acceptedWordLength = 5;
 
   useEffect(() => {
@@ -61,12 +64,30 @@ function App() {
     }
   };
   useEffect(() => {
+    console.log('store game state')
     if (gameStartedAt === null) {
       return;
     }
 
     storeGameState({dayIndex: getDay(), gameStartedAt, isGameWon, isGameLost, guesses, currentGuess})
   }, [gameStartedAt, isGameLost, isGameWon, guesses, currentGuess]);
+
+  // useEffect(() => {
+  //   if (gameStartedAt === null) {
+  //     return;
+  //   }
+
+  //   const intervalId = setInterval(() => {
+  //     const updatedAt = Date.now();
+  //     const elapsedTimeMs = updatedAt - gameStartedAt;
+  //     const opaqueTimeLimitMs = timeLimitMs-(timeLimitMs/2);
+  //     // console.log(1, gameStartedAt, updatedAt, elapsedTimeMs)
+  //     const dangerColorOpacity = elapsedTimeMs/opaqueTimeLimitMs;
+  //     setBackgroundColor(`rgba(255, ${255-255*dangerColorOpacity}, ${255-255*dangerColorOpacity}, ${1*dangerColorOpacity})`);
+  //   }, 10);
+
+  //   return () => clearInterval(intervalId)
+  // }, [gameStartedAt, timeLimitMs])
 
   const onDelete = () => {
     setCurrentGuess(currentGuess.slice(0, -1));
@@ -80,6 +101,7 @@ function App() {
     }
     if (gameStartedAt === null) {
       setGameStartedAt(Date.now());
+      console.log('game started at', gameStartedAt)
     }
     if (!isTurnSkipped && !isWordInWordList(currentGuess)) {
       setIsWordNotFoundAlertOpen(true);
@@ -139,9 +161,8 @@ function App() {
       window.removeEventListener("keydown", downHandler);
     };
   });
-
   return (
-    <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div className="max-w-7xl mx-auto sm:px-6 lg:px-8" style={{backgroundColor}}>
       <Alert message="Word not found" isOpen={isWordNotFoundAlertOpen} />
       <div className="flex w-80 mx-auto items-center mb-8">
         <h1 className="text-xl grow font-bold">Speedle</h1>
@@ -150,7 +171,13 @@ function App() {
           onClick={() => setIsInfoModalOpen(true)}
         />
       </div>
-      <Grid guesses={guesses} currentGuess={currentGuess} maxGuessCount={maxGuessCount} />
+      <Grid
+        guesses={guesses}
+        currentGuess={currentGuess}
+        maxGuessCount={maxGuessCount}
+        gameStartedAt={gameStartedAt}
+        timeLimitMs={timeLimitMs}
+      />
       {isTimerActive() && <TimeLeft startedAt={guessTimeStartedAt!} timeLimitMs={guessTimeLimitMs} />}
       <Keyboard
         onChar={onChar}
